@@ -56,28 +56,8 @@ def EdmondsKarp(G, source, end):
     return maxFlow
 
 
-inputsConn = ["clique5", "clique20", "clique100", "clique200", "cycle", "grid5x5", "grid100x100", "path", "rand20_100", "rand100_500", "simple"]
 inputsFlow = ["clique5", "clique20", "clique100", "grid5x5", "grid100x100", "pp100", "rand20_100", "rand100_500", "simple", "simple2", "trivial", "trivial2", "worstcase"]
-
-for inputGraph in inputsConn:
-    fileName = 'input/connectivity/' + inputGraph
-    print(inputGraph)
-
-    (V,L) = loadDirectedWeightedGraph(fileName)
-    G = ReadToAdjList(L, V)
-
-    print(EdmondsKarp(G, 0, V-1))
-
-    newG = [[] for _ in range(V)]
-    for u, v, w in L:
-        u -= 1
-        v -= 1
-        newG[u].append((v, 1))
-        newG[v].append((u, 0))
-
-    print("Number of edge disjoint paths: ")
-    print(EdmondsKarp(newG, 0, V-1))
-    print(readSolution(fileName))
+inputsConn = ["clique5", "clique20", "clique100", "clique200", "cycle", "grid5x5", "grid100x100", "path", "rand20_100", "rand100_500", "simple"]
 
 for inputGraph in inputsFlow:
     fileName = 'input/flow/' + inputGraph
@@ -86,6 +66,32 @@ for inputGraph in inputsFlow:
     (V,L) = loadDirectedWeightedGraph(fileName)
     G = ReadToAdjList(L, V)
 
-    print(EdmondsKarp(G, 0, V-1))
+    dupa = EdmondsKarp(G, 0, V-1)
+    print(dupa)
+    assert dupa == int(readSolution(fileName))
+    print(readSolution(fileName))
+
+for inputGraph in inputsConn:
+    fileName = 'input/connectivity/' + inputGraph
+    print(inputGraph)
+
+    (V, L) = loadDirectedWeightedGraph(fileName)
+
+    newG = [[] for _ in range(V)]
+
+    for u, v, _ in L:
+        u -= 1
+        v -= 1
+        newG[u].append((v, 1))
+        newG[v].append((u, 1))
+
+    min_cut = float('inf')
+    for source in range(V):
+        for end in range(source + 1, V):
+            max_flow = EdmondsKarp(newG, source, end)
+            min_cut = min(min_cut, max_flow)
+
+    print(min_cut)
+    assert min_cut == int(readSolution(fileName))
     print(readSolution(fileName))
 
